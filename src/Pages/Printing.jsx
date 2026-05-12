@@ -391,7 +391,7 @@ const Printing = () => {
     setShowFilters(false);
 
     // ✅ remove state + search params so it doesn’t loop
-    navigate("/printing", { replace: true });
+    navigate("/Printing", { replace: true });
   }
 }, [location.state, navigate]);
 

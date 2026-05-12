@@ -13,7 +13,14 @@ import {
   Filter,
   Clock,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  MapPin,
+  TrendingUp,
+  Tag,
+  Phone,
+  Mail,
+  Building2,
+  Hash
 } from 'lucide-react'
 
 const NewsToday = () => {
@@ -87,11 +94,22 @@ const NewsToday = () => {
           
           // ✅ MEDIA
           mainImage: d.mainImageUrl || null,
+          mainImagePath: d.mainImagePath || null,
           gallery: Array.isArray(d.gallery) ? d.gallery : [],
+          galleryPaths: Array.isArray(d.galleryPaths) ? d.galleryPaths : [],
           videoUrl: d.videoUrl || null,
+          videoPath: d.videoPath || null,
+
+          // ✅ NEW FIELDS
+          location: d.location || '',
+          marketRates: Array.isArray(d.marketRates) ? d.marketRates : [],
+
+          // ✅ NEW FIELDS
+          location: d.location || '',
+          marketRates: Array.isArray(d.marketRates) ? d.marketRates : [],
 
           hasVideo: !!d.videoUrl,
-          hasGallery: Array.isArray(d.gallery) && d.gallery.length > 0,
+          hasGallery: (Array.isArray(d.gallery) && d.gallery.length > 0) || (Array.isArray(d.galleryPaths) && d.galleryPaths.length > 0),
           createdAt: d.createdAt,
         }
       })
@@ -289,6 +307,14 @@ const NewsToday = () => {
                     </div>
                   </div>
 
+                  {/* LOCATION */}
+                  {article.location && (
+                    <div className="flex items-center gap-2 mt-2 text-gray-500">
+                      <MapPin size={14} className="text-purple-500" />
+                      <span className="text-xs font-medium uppercase tracking-wider">{article.location}</span>
+                    </div>
+                  )}
+
                   {/* READ MORE BUTTON */}
                   <button className="mt-4 w-full py-3 bg-gradient-to-r from-gray-50 to-gray-100 
                                    rounded-lg text-purple-600 font-semibold flex items-center justify-center gap-2
@@ -333,6 +359,12 @@ const NewsToday = () => {
                         <span>{selectedArticle.author}</span>
                         <Calendar size={14} className="ml-4" />
                         <span>{selectedArticle.date}</span>
+                        {selectedArticle.location && (
+                          <>
+                            <MapPin size={14} className="ml-4 text-purple-600" />
+                            <span className="font-semibold text-purple-700">{selectedArticle.location}</span>
+                          </>
+                        )}
                       </div>
                     </div>
                     <button 
@@ -477,6 +509,59 @@ const NewsToday = () => {
                           {selectedArticle.content}
                         </p>
                       </div>
+
+                      {/* MARKET RATES */}
+                      {selectedArticle.marketRates && selectedArticle.marketRates.length > 0 && (
+                        <div className="mt-8">
+                          <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                              <Phone size={24} className="text-blue-600" />
+                            </div>
+                            <div>
+                              <h3 className="text-xl font-bold text-gray-900">
+                                Contact Details
+                              </h3>
+                              <p className="text-gray-600">Connect with the provider</p>
+                            </div>
+                          </div>
+                          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden p-6 space-y-4">
+                            {/* Standard Location Field */}
+                            {selectedArticle.location && (
+                              <div className="flex gap-2 text-lg">
+                                <span className="text-gray-900 font-bold min-w-[100px]">Location:</span>
+                                <span className="text-gray-700">{selectedArticle.location}</span>
+                              </div>
+                            )}
+
+                            {/* Contact Details / Market Rates */}
+                            {selectedArticle.marketRates.map((rate, index) => {
+                              const labels = [
+                                { first: "Name", second: "Email" },
+                                { first: "Phone", second: "Address" },
+                                { first: "City", second: "Pincode" }
+                              ];
+                              const currentLabel = labels[index] || { first: "Label", second: "Value" };
+
+                              return (
+                                <React.Fragment key={`rate-group-${index}`}>
+                                  {rate.itemName && (
+                                    <div className="flex gap-2 text-lg">
+                                      <span className="text-gray-900 font-bold min-w-[110px]">{currentLabel.first}:</span>
+                                      <span className="text-gray-700">{rate.itemName}</span>
+                                    </div>
+                                  )}
+                                  {rate.price && (
+                                    <div className="flex gap-2 text-lg">
+                                      <span className="text-gray-900 font-bold min-w-[110px]">{currentLabel.second}:</span>
+                                      <span className="text-gray-700">{rate.price}</span>
+                                    </div>
+                                  )}
+                                </React.Fragment>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* ACTION BUTTONS */}

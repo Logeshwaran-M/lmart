@@ -91,7 +91,7 @@ const Footer = () => {
     <li><Link to="/" onClick={scrollToTop} className="text-gray-400 hover:text-white transition hover:translate-x-1 duration-300 inline-block">Home</Link></li>
     <li><Link to="/e-store" onClick={scrollToTop} className="text-gray-400 hover:text-white transition hover:translate-x-1 duration-300 inline-block">E-Store</Link></li>
     <li><Link to="/local-market" onClick={scrollToTop} className="text-gray-400 hover:text-white transition hover:translate-x-1 duration-300 inline-block">Local Market</Link></li>
-    <li><Link to="/printing" onClick={scrollToTop} className="text-gray-400 hover:text-white transition hover:translate-x-1 duration-300 inline-block">Printing</Link></li>
+    <li><Link to="/Printing" onClick={scrollToTop} className="text-gray-400 hover:text-white transition hover:translate-x-1 duration-300 inline-block">Printing</Link></li>
     <li><Link to="/market-news" onClick={scrollToTop} className="text-gray-400 hover:text-white transition hover:translate-x-1 duration-300 inline-block">Market News</Link></li>
     <li><Link to="/oldee" onClick={scrollToTop} className="text-gray-400 hover:text-white transition hover:translate-x-1 duration-300 inline-block">Oldee</Link></li>
   </ul>

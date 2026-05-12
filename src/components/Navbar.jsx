@@ -985,7 +985,7 @@ const Navbar = () => {
                 to="/Printing"
                 state={{ resetFilters: true }}   // ✅ ADD
                 onClick={scrollToTop}
-                className={`text-blue-700 hover:text-purple-500 font-medium relative text-m ${location.pathname === "/printing" ? "active-nav-item" : ""
+                className={`text-blue-700 hover:text-purple-500 font-medium relative text-m ${location.pathname === "/Printing" ? "active-nav-item" : ""
                   }`}
               >
                 Printing
@@ -1350,7 +1350,7 @@ const Navbar = () => {
                 </Link>
 
                 <Link
-                  to="/printing"
+                  to="/Printing"
                   state={{ resetFilters: true }}   // ✅ ADD
                   onClick={() => {
                     setIsMenuOpen(false);

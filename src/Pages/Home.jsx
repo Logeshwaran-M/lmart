@@ -878,7 +878,7 @@ const selectRandomProducts = (products) => {
 
             {/* Printing Box */}
             <Link
-              to="/printing"
+              to="/Printing"
               className="group relative animate-float delay-200"
               style={{ animationDelay: "0.2s" }}
             >

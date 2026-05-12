@@ -23,7 +23,7 @@ const NotFound = () => {
           
           <div className="flex justify-center space-x-4">
             <Link 
-              to="/printing" 
+              to="/Printing" 
               className="text-purple-600 hover:text-purple-700 font-medium"
             >
               Printing Services

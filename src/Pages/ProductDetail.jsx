@@ -440,7 +440,7 @@ const RelatedProducts = ({
                 storePath = "/local-market";
                 break;
               case "printing":
-                storePath = "/printing";
+                storePath = "/Printing";
                 break;
               default:
                 storePath = "/e-store";
@@ -451,7 +451,7 @@ const RelatedProducts = ({
   source === "local-market"
     ? "/local-market"
     : source === "printing"
-    ? "/printing"
+    ? "/Printing"
     : "/e-store"
 );
 
@@ -762,7 +762,7 @@ const manualImageChangeRef = useRef(false);
   const path = location.pathname;
 
   if (path.startsWith("/local-market")) return "local-market";
-  if (path.startsWith("/printing")) return "printing";
+  if (path.startsWith("/Printing")) return "printing";
 
   return (
     location.state?.source ||
@@ -848,7 +848,7 @@ const source = resolvedSource;
 
 const STORE_ROUTES = {
   "local-market": "/local-market",
-  printing: "/printing",
+  printing: "/Printing",
   "e-store": "/e-store",
 };
 
@@ -1917,7 +1917,7 @@ const allMedia = [
   onClick={() => {
     const STORE_ROUTES = {
       "local-market": "/local-market",
-      printing: "/printing",
+      printing: "/Printing",
       "e-store": "/e-store",
     };
 
