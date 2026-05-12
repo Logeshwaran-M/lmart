@@ -30,7 +30,7 @@ const NewsToday = () => {
   const [categories, setCategories] = useState(['all'])
   const [loading, setLoading] = useState(true)
   const [selectedArticle, setSelectedArticle] = useState(null)
-  const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0)
+  const [featuredImage, setFeaturedImage] = useState(null)
   const [isSearchFocused, setIsSearchFocused] = useState(false)
 
   const videoRef = useRef(null)
@@ -86,7 +86,7 @@ const NewsToday = () => {
           id: doc.id,
           title: d.title || 'Untitled',
           excerpt: d.excerpt || '',
-          content: d.excerpt || '',
+          content: d.content || d.excerpt || '',
           category: d.category || 'General',
           author: d.author || 'Admin',
           date: formatDate(d.date || d.createdAt),
@@ -100,11 +100,6 @@ const NewsToday = () => {
           videoUrl: d.videoUrl || null,
           videoPath: d.videoPath || null,
 
-          // ✅ NEW FIELDS
-          location: d.location || '',
-          marketRates: Array.isArray(d.marketRates) ? d.marketRates : [],
-
-          // ✅ NEW FIELDS
           location: d.location || '',
           marketRates: Array.isArray(d.marketRates) ? d.marketRates : [],
 
@@ -134,27 +129,27 @@ const NewsToday = () => {
   /* ---------- CLOSE MODAL ---------- */
   const closeModal = () => {
     setSelectedArticle(null)
-    setCurrentGalleryIndex(0)
+    setFeaturedImage(null)
     if (videoRef.current) {
       videoRef.current.pause()
       videoRef.current.currentTime = 0
     }
   }
 
-  /* ---------- GALLERY NAVIGATION ---------- */
+  const allImages = selectedArticle ? [selectedArticle.mainImage, ...selectedArticle.gallery].filter(Boolean) : []
+
   const nextGalleryImage = () => {
-    if (selectedArticle?.gallery) {
-      setCurrentGalleryIndex((prev) => 
-        prev === selectedArticle.gallery.length - 1 ? 0 : prev + 1
-      )
+    if (allImages.length > 0) {
+      const nextIndex = (allImages.indexOf(featuredImage) + 1) % allImages.length
+      setFeaturedImage(allImages[nextIndex])
     }
   }
 
   const prevGalleryImage = () => {
-    if (selectedArticle?.gallery) {
-      setCurrentGalleryIndex((prev) => 
-        prev === 0 ? selectedArticle.gallery.length - 1 : prev - 1
-      )
+    if (allImages.length > 0) {
+      const currentIndex = allImages.indexOf(featuredImage)
+      const prevIndex = currentIndex <= 0 ? allImages.length - 1 : currentIndex - 1
+      setFeaturedImage(allImages[prevIndex])
     }
   }
 
@@ -223,7 +218,10 @@ const NewsToday = () => {
             {filtered.map(article => (
               <div
                 key={article.id}
-                onClick={() => setSelectedArticle(article)}
+                onClick={() => {
+                  setSelectedArticle(article)
+                  setFeaturedImage(article.mainImage)
+                }}
                 className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl cursor-pointer overflow-hidden
                          transform hover:-translate-y-1 transition-all duration-300 border border-gray-100"
               >
@@ -378,17 +376,60 @@ const NewsToday = () => {
 
                 {/* SCROLLABLE CONTENT */}
                 <div className="max-h-[80vh] overflow-y-auto">
-                  {/* MAIN IMAGE */}
-                  {selectedArticle.mainImage && (
-                    <div className="h-96 bg-gradient-to-br from-gray-50 to-gray-100 flex justify-center items-center relative">
-                      <img
-                        src={selectedArticle.mainImage}
-                        className="max-h-full max-w-full object-contain p-4"
-                        alt=""
-                      />
-                      <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
-                        Featured Image
+                  {/* FEATURED MEDIA VIEWER */}
+                  {featuredImage && (
+                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 border-b">
+                      {/* LARGE VIEW */}
+                      <div className="relative group bg-black/5 flex justify-center items-center overflow-hidden">
+                        <img
+                          src={featuredImage}
+                          className="w-full h-auto max-h-[700px] object-contain transition-all duration-500"
+                          alt="Featured"
+                        />
+                        
+                        {/* Navigation Arrows (Only on Hover) */}
+                        {allImages.length > 1 && (
+                          <>
+                            <button
+                              onClick={prevGalleryImage}
+                              className="absolute left-6 top-1/2 -translate-y-1/2 p-4 bg-white/90 backdrop-blur-md rounded-full shadow-2xl 
+                                         opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110 z-10"
+                            >
+                              <ChevronLeft size={32} className="text-gray-900" />
+                            </button>
+                            <button
+                              onClick={nextGalleryImage}
+                              className="absolute right-6 top-1/2 -translate-y-1/2 p-4 bg-white/90 backdrop-blur-sm rounded-full shadow-2xl 
+                                         opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110 z-10"
+                            >
+                              <ChevronRight size={32} className="text-gray-900" />
+                            </button>
+                          </>
+                        )}
+
+                        {/* Image Counter Badge */}
+                        <div className="absolute bottom-6 right-6 bg-black/60 backdrop-blur-md text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg">
+                          {allImages.indexOf(featuredImage) + 1} / {allImages.length}
+                        </div>
                       </div>
+
+                      {/* THUMBNAIL STRIP */}
+                      {allImages.length > 1 && (
+                        <div className="bg-white/50 backdrop-blur-sm p-4 flex gap-3 overflow-x-auto scrollbar-hide border-t">
+                          {allImages.map((img, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setFeaturedImage(img)}
+                              className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 transform
+                                         ${img === featuredImage 
+                                           ? 'border-purple-600 ring-4 ring-purple-100 scale-105 shadow-lg' 
+                                           : 'border-transparent hover:border-gray-300 hover:scale-105 shadow-sm'}`}
+                            >
+                              <img src={img} className="w-full h-full object-cover" alt="" />
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -422,76 +463,6 @@ const NewsToday = () => {
                     </div>
                   )}
 
-                  {/* GALLERY */}
-                  {selectedArticle.gallery.length > 0 && (
-                    <div className="px-8 pt-8">
-                      <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-blue-100 rounded-lg">
-                            <ImageIcon size={24} className="text-blue-600" />
-                          </div>
-                          <div>
-                            <h3 className="text-xl font-bold text-gray-900">
-                              Photo Gallery
-                            </h3>
-                            <p className="text-gray-600">
-                              {selectedArticle.gallery.length} photos
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={prevGalleryImage}
-                            className="p-2 hover:bg-gray-100 rounded-full"
-                          >
-                            <ChevronLeft size={24} />
-                          </button>
-                          <span className="text-sm text-gray-600">
-                            {currentGalleryIndex + 1} / {selectedArticle.gallery.length}
-                          </span>
-                          <button
-                            onClick={nextGalleryImage}
-                            className="p-2 hover:bg-gray-100 rounded-full"
-                          >
-                            <ChevronRight size={24} />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="relative h-96 rounded-xl overflow-hidden mb-4">
-                        <img
-                          src={selectedArticle.gallery[currentGalleryIndex]}
-                          className="w-full h-full object-contain bg-gray-50"
-                          alt={`Gallery image ${currentGalleryIndex + 1}`}
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                          <p className="text-white text-sm">
-                            Image {currentGalleryIndex + 1} of {selectedArticle.gallery.length}
-                          </p>
-                        </div>
-                      </div>
-                      {selectedArticle.gallery.length > 1 && (
-                        <div className="grid grid-cols-4 gap-2">
-                          {selectedArticle.gallery.map((img, i) => (
-                            <button
-                              key={i}
-                              onClick={() => setCurrentGalleryIndex(i)}
-                              className={`h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                                i === currentGalleryIndex 
-                                  ? 'border-purple-600 ring-2 ring-purple-200' 
-                                  : 'border-transparent hover:border-gray-300'
-                              }`}
-                            >
-                              <img
-                                src={img}
-                                className="w-full h-full object-cover"
-                                alt=""
-                              />
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
 
                   {/* CONTENT */}
                   <div className="p-8">
@@ -500,15 +471,12 @@ const NewsToday = () => {
                     </h1>
                     
                     <div className="prose prose-lg max-w-none">
-                      <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                        {selectedArticle.excerpt}
-                      </p>
-                      
                       <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl mb-8">
                         <p className="text-gray-700 whitespace-pre-line leading-relaxed">
                           {selectedArticle.content}
                         </p>
                       </div>
+                    </div>
 
                       {/* MARKET RATES */}
                       {selectedArticle.marketRates && selectedArticle.marketRates.length > 0 && (
@@ -534,31 +502,19 @@ const NewsToday = () => {
                             )}
 
                             {/* Contact Details / Market Rates */}
-                            {selectedArticle.marketRates.map((rate, index) => {
-                              const labels = [
-                                { first: "Name", second: "Email" },
-                                { first: "Phone", second: "Address" },
-                                { first: "City", second: "Pincode" }
-                              ];
-                              const currentLabel = labels[index] || { first: "Label", second: "Value" };
-
-                              return (
-                                <React.Fragment key={`rate-group-${index}`}>
-                                  {rate.itemName && (
-                                    <div className="flex gap-2 text-lg">
-                                      <span className="text-gray-900 font-bold min-w-[110px]">{currentLabel.first}:</span>
-                                      <span className="text-gray-700">{rate.itemName}</span>
-                                    </div>
-                                  )}
-                                  {rate.price && (
-                                    <div className="flex gap-2 text-lg">
-                                      <span className="text-gray-900 font-bold min-w-[110px]">{currentLabel.second}:</span>
-                                      <span className="text-gray-700">{rate.price}</span>
-                                    </div>
-                                  )}
-                                </React.Fragment>
-                              );
-                            })}
+                            {selectedArticle.marketRates.map((rate, index) => (
+                              <div 
+                                key={`rate-${index}`} 
+                                className="flex gap-2 text-lg"
+                              >
+                                <span className="text-gray-900 font-bold min-w-[110px] capitalize">
+                                  {rate.itemName}:
+                                </span>
+                                <span className="text-gray-700">
+                                  {rate.price}
+                                </span>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       )}
@@ -583,7 +539,6 @@ const NewsToday = () => {
               </div>
             </div>
           </div>
-        </div>
       )}
     </div>
   )
